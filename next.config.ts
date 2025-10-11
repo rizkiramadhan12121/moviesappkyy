@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled untuk menghindari critters error
   },
   compress: true,
   poweredByHeader: false,

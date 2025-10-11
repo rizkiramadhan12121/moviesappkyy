@@ -6,8 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "setup": "node setup.js",
-    "postbuild": "next-sitemap"
+    "setup": "node setup.js"
   },
   "dependencies": {
     "date-fns": "^3.6.0",
