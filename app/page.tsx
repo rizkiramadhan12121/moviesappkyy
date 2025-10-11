@@ -1,103 +1,257 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Film, RefreshCw, AlertCircle } from 'lucide-react';
+import Logo from './components/Logo';
+import SearchBar from './components/SearchBar';
+import FilterTabs from './components/FilterTabs';
+import MovieGrid from './components/MovieGrid';
+import LoadingSpinner from './components/LoadingSpinner';
+import AutoUpdateIndicator from './components/AutoUpdateIndicator';
+import HeroSection from './components/HeroSection';
+import SetupInstructions from './components/SetupInstructions';
+import ModernHeader from './components/ModernHeader';
+import FloatingParticles from './components/FloatingParticles';
+import ErrorBoundary from './components/ErrorBoundary';
+import SearchLoadingState from './components/SearchLoadingState';
+
+interface Movie {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  vote_average: number;
+  release_date: string;
+  release_date_formatted: string;
+  adult: boolean;
+}
+
+interface MovieResponse {
+  results: Movie[];
+  page: number;
+  total_pages: number;
+  total_results: number;
+  last_updated: string;
+  error?: string;
+}
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('trending');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const [isAutoUpdating, setIsAutoUpdating] = useState(false);
+  const [featuredMovie, setFeaturedMovie] = useState<Movie | null>(null);
+  const [showSetupInstructions, setShowSetupInstructions] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  // Fetch movies based on filter
+  const fetchMovies = async (filter: string, query?: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const url = query 
+        ? `/api/movies/search?q=${encodeURIComponent(query)}`
+        : `/api/movies?type=${filter}`;
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Gagal mengambil data film');
+      }
+      
+      const data: MovieResponse = await response.json();
+      
+      // Check if it's an API key error
+      if (data.error && data.error.includes('API key TMDB belum diset')) {
+        setShowSetupInstructions(true);
+        setError(data.error);
+        return;
+      }
+      
+      setMovies(data.results);
+      setLastUpdated(data.last_updated);
+      setShowSetupInstructions(false);
+      
+      // Set featured movie (first movie from trending)
+      if (filter === 'trending' && data.results.length > 0 && !query) {
+        setFeaturedMovie(data.results[0]);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle search with debounce
+  const handleSearch = useCallback(async (query: string) => {
+    setSearchQuery(query);
+    if (query.trim()) {
+      setIsSearching(true);
+      setIsLoading(true);
+      try {
+        await fetchMovies(activeFilter, query);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setIsSearching(false);
+      setIsLoading(true);
+      try {
+        await fetchMovies(activeFilter);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  }, [activeFilter]);
+
+  // Handle filter change
+  const handleFilterChange = async (filter: string) => {
+    setActiveFilter(filter);
+    setSearchQuery('');
+    setIsSearching(false);
+    setIsLoading(true);
+    await fetchMovies(filter);
+  };
+
+  // Auto-refresh every hour
+  useEffect(() => {
+    fetchMovies(activeFilter);
+    
+    const interval = setInterval(async () => {
+      setIsAutoUpdating(true);
+      try {
+        await fetchMovies(activeFilter);
+      } finally {
+        setIsAutoUpdating(false);
+      }
+    }, 3600000); // 1 hour
+
+    return () => clearInterval(interval);
+  }, [activeFilter]);
+
+  const getFilterTitle = () => {
+    if (isSearching) return `Hasil pencarian untuk "${searchQuery}"`;
+    
+    const titles = {
+      trending: 'Film Trending Hari Ini',
+      popular: 'Film Populer',
+      now_playing: 'Film Sedang Tayang',
+      upcoming: 'Film Segera Hadir'
+    };
+    
+    return titles[activeFilter as keyof typeof titles] || 'Film Terbaru';
+  };
+
+  return (
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20 relative overflow-hidden">
+        {/* Floating Particles */}
+        <FloatingParticles />
+        
+        {/* Modern Header */}
+        <ModernHeader 
+          onSearch={handleSearch}
+          isLoading={isLoading && isSearching}
+          lastUpdated={lastUpdated}
+        />
+
+        {/* Main Content */}
+        <main className="container mx-auto px-4 py-8 pt-24">
+        {/* Hero Section */}
+        {!isSearching && activeFilter === 'trending' && featuredMovie && (
+          <HeroSection featuredMovie={featuredMovie} />
+        )}
+        
+        <FilterTabs 
+          activeFilter={activeFilter}
+          onFilterChange={handleFilterChange}
+        />
+
+          <AnimatePresence mode="wait">
+            {showSetupInstructions ? (
+              <SetupInstructions />
+            ) : error ? (
+              <motion.div 
+                key="error"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex flex-col items-center justify-center py-12"
+              >
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Oops! Terjadi Kesalahan
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 text-center mb-6 max-w-md">
+                  {error}
+                </p>
+                <motion.button
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => fetchMovies(activeFilter)}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
+                >
+                  Coba Lagi
+                </motion.button>
+              </motion.div>
+            ) : isSearching && isLoading ? (
+              <SearchLoadingState 
+                query={searchQuery}
+                isLoading={isLoading}
+              />
+            ) : (
+              <MovieGrid 
+                key={activeFilter + searchQuery}
+                movies={movies}
+                title={getFilterTitle()}
+                isLoading={isLoading && !isSearching}
+              />
+            )}
+          </AnimatePresence>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Footer */}
+        <motion.footer 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-t border-gray-200/50 dark:border-gray-700/50 py-12 mt-16"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <div className="container mx-auto px-4 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-center gap-3 mb-4"
+            >
+              <Logo size="md" />
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                MoviesKyy
+              </span>
+            </motion.div>
+            <p className="text-gray-600 dark:text-gray-400">
+              © 2025 MoviesKyy - Platform streaming film terbaik dengan update harian otomatis
+            </p>
+          </div>
+        </motion.footer>
+
+        {/* Auto Update Indicator */}
+        <AutoUpdateIndicator 
+          lastUpdated={lastUpdated}
+          isUpdating={isAutoUpdating}
+          hasError={!!error}
+        />
+      </div>
+    </ErrorBoundary>
   );
 }

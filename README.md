@@ -1,36 +1,136 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MoviesKyy - Platform Streaming Film Modern
 
-## Getting Started
+MoviesKyy adalah aplikasi web modern untuk menampilkan koleksi film terbaru dan terpopuler dengan update harian otomatis. Dibangun dengan Next.js 15, TypeScript, dan Tailwind CSS dengan animasi yang smooth menggunakan Framer Motion.
 
-First, run the development server:
+## ✨ Fitur Utama
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 🎬 **Koleksi Film Lengkap** - Film trending, populer, sedang tayang, dan segera hadir
+- 🔍 **Pencarian Cerdas** - Cari film favorit dengan pencarian real-time
+- 🎨 **Desain Modern** - UI/UX yang responsif dan menarik dengan animasi smooth
+- 🔄 **Auto-Update Harian** - Data film terupdate otomatis setiap jam
+- 📱 **Responsive Design** - Optimal di semua perangkat (desktop, tablet, mobile)
+- 🌙 **Dark Mode** - Tema gelap dan terang yang dapat disesuaikan
+- ⚡ **Performance Optimized** - Loading cepat dengan optimasi gambar dan caching
+
+## 🚀 Teknologi yang Digunakan
+
+- **Next.js 15** - React framework dengan App Router
+- **TypeScript** - Type safety dan developer experience yang lebih baik
+- **Tailwind CSS** - Utility-first CSS framework
+- **Framer Motion** - Animasi dan transisi yang smooth
+- **Lucide React** - Icon library yang modern
+- **TMDB API** - Database film terlengkap dan terpercaya
+
+## 🛠️ Instalasi dan Setup
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm, yarn, atau pnpm
+- Akun TMDB (untuk API key)
+
+## 📁 Struktur Project
+
+```
+moviesapp/
+├── app/
+│   ├── api/
+│   │   └── movies/
+│   │       ├── route.ts          # API endpoint untuk film
+│   │       └── search/
+│   │           └── route.ts       # API endpoint untuk pencarian
+│   ├── components/
+│   │   ├── AutoUpdateIndicator.tsx
+│   │   ├── FilterTabs.tsx
+│   │   ├── HeroSection.tsx
+│   │   ├── LoadingSpinner.tsx
+│   │   ├── MovieCard.tsx
+│   │   ├── MovieGrid.tsx
+│   │   └── SearchBar.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── public/
+├── package.json
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Fitur Detail
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Auto-Update System
+- Data film terupdate otomatis setiap jam
+- Indikator visual untuk status update
+- Error handling yang robust
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Pencarian Film
+- Pencarian real-time dengan debouncing
+- Hasil pencarian yang relevan
+- Loading state yang smooth
 
-## Learn More
+### Filter Kategori
+- **Trending** - Film yang sedang trending hari ini
+- **Populer** - Film-film populer
+- **Sedang Tayang** - Film yang sedang tayang di bioskop
+- **Segera Hadir** - Film yang akan segera rilis
 
-To learn more about Next.js, take a look at the following resources:
+### Animasi dan Transisi
+- Fade in/out animations
+- Hover effects yang smooth
+- Loading animations
+- Stagger animations untuk grid items
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Customization
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Mengubah Tema Warna
+Edit file `app/globals.css` untuk mengubah warna utama:
+```css
+:root {
+  --primary-color: #3b82f6; /* Blue */
+  --secondary-color: #8b5cf6; /* Purple */
+}
+```
 
-## Deploy on Vercel
+### Menambah Kategori Film
+Edit file `app/components/FilterTabs.tsx` untuk menambah kategori baru.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🚀 Deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Vercel (Recommended)
+1. Push code ke GitHub
+2. Connect repository ke Vercel
+3. Set environment variables di Vercel dashboard
+4. Deploy otomatis
+
+### Manual Deployment
+```bash
+npm run build
+npm start
+```
+
+## 🤝 Contributing
+
+1. Fork repository
+2. Buat feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
+
+## 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 🙏 Acknowledgments
+
+- [The Movie Database (TMDB)](https://www.themoviedb.org/) untuk API film
+- [Next.js](https://nextjs.org/) untuk framework
+- [Tailwind CSS](https://tailwindcss.com/) untuk styling
+- [Framer Motion](https://www.framer.com/motion/) untuk animasi
+- [Lucide](https://lucide.dev/) untuk icons
+
+## 📞 Support
+
+Jika ada pertanyaan atau masalah, silakan buat issue di repository ini.
+
+---
+
+**MoviesKyy** - Platform streaming film terbaik dengan update harian otomatis 🎬✨
