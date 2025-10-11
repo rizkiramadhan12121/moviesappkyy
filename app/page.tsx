@@ -31,7 +31,7 @@ interface Movie {
 interface MovieResponse {
   results: Movie[];
   page: number;
-  total_pages: number;
+  total_pagnes: number;
   total_results: number;
   last_updated: string;
   error?: string;

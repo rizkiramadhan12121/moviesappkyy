@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const TMDB_API_KEY = process.env.TMDB_API_KEY || 'your_tmdb_api_key_here';
+const TMDB_API_KEY = process.env.TMDB_API_KEY || 'ce725449610772d662f52a3c5f1c0981';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
 export async function GET(request: NextRequest) {
   try {
     // Check if API key is set
-    if (!TMDB_API_KEY || TMDB_API_KEY === 'your_tmdb_api_key_here') {
+    if (!TMDB_API_KEY || TMDB_API_KEY === 'ce725449610772d662f52a3c5f1c0981') {
       console.error('TMDB API key not set');
       return NextResponse.json(
         { 
