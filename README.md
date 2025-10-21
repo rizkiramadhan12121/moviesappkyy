@@ -23,6 +23,8 @@ MoviesKyy adalah aplikasi web modern untuk menampilkan koleksi film terbaru dan 
 
 ## 🛠️ Instalasi dan Setup
 
+auto update
+
 ### Prerequisites
 
 - Node.js 18+ 
