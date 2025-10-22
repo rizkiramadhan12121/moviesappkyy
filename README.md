@@ -32,6 +32,7 @@ api
 - Node.js 18+ 
 - npm, yarn, atau pnpm
 - Akun TMDB (untuk API key)
+- yailwind css
 
 ## 📁 Struktur Project
 
