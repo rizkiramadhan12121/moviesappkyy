@@ -81,7 +81,7 @@ moviesapp/
 ### Animasi dan Transisi
 - Fade in/out animations
 - Hover effects yang smooth
-- Loading animations
+- Loading animation
 - Stagger animations untuk grid items
 
 ## 🎨 Customization
