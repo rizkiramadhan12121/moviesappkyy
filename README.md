@@ -36,7 +36,7 @@ api
 
 ## 📁 Struktur Project
 
-`xky
+`xkyy
 
 moviesapp/
 ├── app/
